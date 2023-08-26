@@ -1,19 +1,62 @@
-import * as core from '@actions/core'
-import {wait} from './wait'
+import * as github from '@actions/github'
 
-async function run(): Promise<void> {
-  try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+import processCmd from './process'
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+const main = async () => {
+  const rawcmd: string = github.context.payload.comment?.body
+  if (!rawcmd) {
+    return
+  }
 
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+  const githubToken = process.env.GH_TOKEN
+  if (!githubToken) {
+    throw new Error('GH_TOKEN is not set')
+  }
+  const octokit = github.getOctokit(githubToken)
+
+  const result = await processCmd(octokit, rawcmd, {
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: github.context.issue.number
+  })
+
+  if (!result) {
+    return
+  }
+
+  if (result.createComment) {
+    await octokit.rest.issues.createComment({
+      ...github.context.repo,
+      issue_number: github.context.issue.number,
+      body: result.createComment
+    })
+  }
+
+  if (result.merge) {
+    // approve the pr
+    await octokit.rest.pulls.createReview({
+      ...github.context.repo,
+      pull_number: github.context.issue.number,
+      event: 'APPROVE'
+    })
+
+    await octokit.rest.pulls.merge({
+      ...github.context.repo,
+      pull_number: github.context.issue.number,
+      sha: result.merge
+    })
+  }
+
+  if (result.close) {
+    await octokit.rest.issues.update({
+      ...github.context.repo,
+      issue_number: github.context.issue.number,
+      state: 'closed'
+    })
   }
 }
 
-run()
+main()
+  // eslint-disable-next-line github/no-then
+  .catch(console.error)
+  .finally(() => process.exit())
