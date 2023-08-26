@@ -136,6 +136,18 @@ const processCmd = async (octokit: ReturnType<typeof github.getOctokit>, rawcmd:
     },
     async close() {
       return handleRfc('reject')
+    },
+    async head() {
+      const api = await create()
+      const head = await new Promise(resolve => {
+        api.rpc.chain.subscribeNewHeads(head => {
+          resolve(head.hash.toHex())
+        })
+      })
+      await api.disconnect()
+      return {
+        createComment: `Current head: ${head}`
+      }
     }
   }
 
