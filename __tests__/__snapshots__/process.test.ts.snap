@@ -1,3 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bot 1`] = `"RFC_APPROVE(0014,ba8418fc46d251acfdd39604c5fe6ea3d69ed464ed4113d50e82ea1c712a44fc)"`;
+exports[`processCmd 1`] = `
+{
+  "createComment": "RFC 14 approved. Merging d4589ded into master",
+  "merge": "d4589ded275b721e33cbeb1e7a27e2f29899cdc3",
+}
+`;
