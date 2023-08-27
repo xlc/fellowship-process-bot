@@ -23,5 +23,5 @@ jobs:
 
 ```
 
-- Create PAT token with read and write permission for pull requests.
+- Create PAT token with read and write permission for pull requests and contents.
 - Provide the PAT token to the GH action with repo secrets `GH_PAT`
