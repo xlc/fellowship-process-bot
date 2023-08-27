@@ -21,12 +21,12 @@ const main = async () => {
     issue_number: github.context.issue.number
   })
 
-  console.log(result)
-
   if (!result) {
     console.log('No result')
     return
   }
+
+  console.log('Result', result)
 
   if (result.createComment) {
     await octokit.rest.issues.createComment({
