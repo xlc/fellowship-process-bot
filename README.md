@@ -10,7 +10,8 @@ on:
   issue_comment:
     types: [created] # only trigger on new issue comments
 env:
-  GH_TOKEN: ${{ secrets.GH_PAT }} # authorize bot
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # authorize bot
+  GH_PAT: ${{ secrets.GH_PAT }} # authorize bot to write to PRs
 jobs:
   process:
     name: Process Comment

@@ -125,7 +125,7 @@ const processCmd = async (octokit: ReturnType<typeof github.getOctokit>, rawcmd:
       }
     }
     return {
-      createComment: `Unable to find fellowshipReferenda.confirmed event at ${blockHash}`
+      createComment: `Unable to find fellowshipReferenda.confirmed event at \`${blockHash}\` for proposal with preimage \`${remarkBodyHash}\``
     }
   }
 

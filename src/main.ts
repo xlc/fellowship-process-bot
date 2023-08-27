@@ -10,8 +10,12 @@ const main = async () => {
   }
 
   const githubToken = process.env.GH_TOKEN
+  const PAT = process.env.GH_PAT || githubToken
   if (!githubToken) {
     throw new Error('GH_TOKEN is not set')
+  }
+  if (!PAT) {
+    throw new Error('this is unreachable')
   }
   const octokit = github.getOctokit(githubToken)
 
@@ -28,6 +32,9 @@ const main = async () => {
 
   console.log('Result', result)
 
+  // use a PAT to merge the PR
+  const patOctokit = github.getOctokit(PAT)
+
   if (result.createComment) {
     await octokit.rest.issues.createComment({
       ...github.context.repo,
@@ -38,13 +45,13 @@ const main = async () => {
 
   if (result.merge) {
     // approve the pr
-    await octokit.rest.pulls.createReview({
+    await patOctokit.rest.pulls.createReview({
       ...github.context.repo,
       pull_number: github.context.issue.number,
       event: 'APPROVE'
     })
 
-    await octokit.rest.pulls.merge({
+    await patOctokit.rest.pulls.merge({
       ...github.context.repo,
       pull_number: github.context.issue.number,
       sha: result.merge
@@ -52,7 +59,7 @@ const main = async () => {
   }
 
   if (result.close) {
-    await octokit.rest.issues.update({
+    await patOctokit.rest.issues.update({
       ...github.context.repo,
       issue_number: github.context.issue.number,
       state: 'closed'
