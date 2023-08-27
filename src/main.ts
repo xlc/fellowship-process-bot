@@ -5,6 +5,7 @@ import processCmd from './process'
 const main = async () => {
   const rawcmd: string = github.context.payload.comment?.body
   if (!rawcmd) {
+    console.log('No comment body found')
     return
   }
 
@@ -20,7 +21,10 @@ const main = async () => {
     issue_number: github.context.issue.number
   })
 
+  console.log(result)
+
   if (!result) {
+    console.log('No result')
     return
   }
 

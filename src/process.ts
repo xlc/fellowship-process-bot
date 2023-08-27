@@ -14,6 +14,7 @@ type Context = {
 const processCmd = async (octokit: ReturnType<typeof github.getOctokit>, rawcmd: string, ctx: Context) => {
   const { cmd, getArg, rawArgs } = parse(rawcmd)
   if (!cmd) {
+    console.log('No command found')
     return
   }
 
