@@ -45,11 +45,15 @@ const main = async () => {
 
   if (result.merge) {
     // approve the pr
-    await patOctokit.rest.pulls.createReview({
-      ...github.context.repo,
-      pull_number: github.context.issue.number,
-      event: 'APPROVE'
-    })
+    try {
+      await patOctokit.rest.pulls.createReview({
+        ...github.context.repo,
+        pull_number: github.context.issue.number,
+        event: 'APPROVE'
+      })
+    } catch (e) {
+      console.log('Unable to approve PR', e)
+    }
 
     await patOctokit.rest.pulls.merge({
       ...github.context.repo,
